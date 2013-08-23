@@ -135,6 +135,7 @@ public class EatlyActivity extends Activity implements SensorEventListener {
             // TODO Auto-generated method stub
             if (m_db != null) {
                 m_db.genDB();
+                m_db.dumpDB();
             }
             return null;
         }

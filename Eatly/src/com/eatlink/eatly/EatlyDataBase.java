@@ -4,8 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,15 +27,11 @@ public class EatlyDataBase {
     private final int CONN_TIMEOUT = 10000;
     private final int DATA_TIMEOUT = 10000;
     private final String url = "http://webstore.test.c4mi.com/food.json";
-    // private JSONObject m_jObj = null;
     private JSONArray m_jarray = null;
     private static EatlyDataBase s_instance = null;
     private static final String JSON_STORE = "store";
     private static final String JSON_QUALITY = "quality";
-    private final String dbfilepath = android.os.Environment.getExternalStorageDirectory().toString() + "/eatly/.db";
-
-    private ConcurrentHashMap<String, String> m_restaurantMap = new ConcurrentHashMap<String, String>();
-    private List<ConcurrentHashMap<String, String>> m_list = null;
+    private ArrayList<HashMap<String, String>> m_list = new ArrayList<HashMap<String, String>>();
 
     static EatlyDataBase getInstance() {
         if (s_instance == null)
@@ -166,12 +162,6 @@ public class EatlyDataBase {
                 e.printStackTrace();
             }
 
-            // try {
-            // tmp_jObj = new JSONObject(json);
-            // } catch (JSONException e) {
-            // printDebug("Error parsing data " + e.toString());
-            // }
-            // return tmp_jObj;
             return tmp_jarray;
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -189,12 +179,11 @@ public class EatlyDataBase {
 
             for (int i = 0; i < jarray.length(); i++) {
                 JSONObject job = jarray.getJSONObject(i);
-                String no = job.getString(Integer.toString(i));
-                String store = job.getString(JSON_STORE);
-                String quality = job.getString(JSON_QUALITY);
-                printDebug("job[" + no + "] store " + store);
-                printDebug("job[" + no + "] quality " + quality);
-                m_restaurantMap.put(Integer.toString(i), store);
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put("No", Integer.toString(i));
+                map.put(JSON_STORE, job.getString(JSON_STORE));
+                map.put(JSON_QUALITY, job.getString(JSON_QUALITY));
+                m_list.add(map);
             }
 
         } catch (JSONException e) {
@@ -204,12 +193,21 @@ public class EatlyDataBase {
 
     }
 
-    public int getDBSize() {
-        return m_restaurantMap.size();
+    public void dumpDB() {
+        for (HashMap<String, String> map : m_list) {
+            printDebug("No" + "\t" + map.get("No"));
+            printDebug(JSON_STORE + "\t" + map.get(JSON_STORE));
+            printDebug(JSON_QUALITY + "\t" + map.get(JSON_QUALITY));
+
+        }
     }
 
-    public String pickOnefromDB(String s) {
-        return m_restaurantMap.get(s);
+    public int getDBSize() {
+        return m_list.size();
+    }
+
+    public String pickOnefromDB(int no) {
+        return m_list.get(no).get(JSON_STORE);
     }
 
     private void printDebug(String s) {

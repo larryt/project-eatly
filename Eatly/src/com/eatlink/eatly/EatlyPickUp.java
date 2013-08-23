@@ -32,7 +32,7 @@ public class EatlyPickUp {
         m_maxsize = m_db.getDBSize();
         if (m_maxsize > 0) {
             int key = r.nextInt(m_maxsize - 0) + 0;
-            selectedshop = m_db.pickOnefromDB(Integer.toString(key));
+            selectedshop = m_db.pickOnefromDB(key);
             printDebug("selection: " + selectedshop);
         } else {
             selectedshop = "no data!!";
